@@ -1,0 +1,10 @@
+{
+  "name": "Трекер Задач",
+  "short_name": "Трекер",
+  "description": "Приложение для отслеживания задач",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1f1f1f",
+  "author": "Валерий Зиновьев"
+}
