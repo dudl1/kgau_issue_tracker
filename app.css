@@ -108,3 +108,40 @@ header {
 .create_task:hover {
     background: rgb(238, 238, 238);
 }
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal_editable {
+    padding-top: 10px;
+}
+
+.modal_content {
+    max-width: 500px;
+    max-height: 500px;
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    overflow-y: scroll;
+    overflow-wrap: anywhere;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.modal_content::-webkit-scrollbar {
+    display: none;
+}
+
+.modal_content > span {
+    font-size: 19px;
+}

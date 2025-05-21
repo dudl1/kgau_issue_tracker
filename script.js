@@ -1,16 +1,3 @@
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then(registration => {
-        console.log('Успешно!');
-      })
-      .catch(err => {
-        console.log('Ошибка: ', err);
-      });
-  });
-}
-
-
 let db
 
 // === ИНИЦИАЛИЗАЦИЯ БАЗЫ ===
@@ -118,6 +105,7 @@ document.querySelector('.create_group').addEventListener('click', () => {
     const group = {
         id,
         title: 'Новая группа',
+        description: '',
         tasks: []
     }
     saveGroupToDB(group)
@@ -229,4 +217,71 @@ document.addEventListener('dblclick', e => {
         removeTaskFromGroup(groupId, taskId)
         taskEl.remove()
     }
+})
+
+
+// === Открытие модального окна ===
+document.addEventListener('click', e => {
+    if (e.target.matches('.group_title span')) {
+        const groupId = e.target.closest('.group').dataset.id
+        const modal = document.querySelector('.modal')
+        const editable = modal.querySelector('.modal_editable')
+
+        // Загружаем описание из БД
+        const tx = db.transaction('groups', 'readonly')
+        const store = tx.objectStore('groups')
+        const request = store.get(groupId)
+
+        request.onsuccess = () => {
+            const group = request.result
+            editable.textContent = group.description || 'Нет описания'
+            editable.dataset.groupId = groupId
+        }
+
+        modal.style.display = 'flex'
+    }
+})
+
+document.querySelector('.modal_editable').addEventListener('contextmenu', e => {
+    e.preventDefault()
+    const el = e.currentTarget
+    el.contentEditable = true
+    el.focus()
+
+    function finishEditing() {
+        el.contentEditable = false
+        el.removeEventListener('blur', finishEditing)
+        document.removeEventListener('keydown', onKeyDown)
+
+        const groupId = el.dataset.groupId
+        const newDescription = el.textContent
+
+        const tx = db.transaction('groups', 'readwrite')
+        const store = tx.objectStore('groups')
+        const request = store.get(groupId)
+
+        request.onsuccess = () => {
+            const group = request.result
+            group.description = newDescription
+            store.put(group)
+        }
+    }
+
+    function onKeyDown(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault()
+            finishEditing()
+        }
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    el.addEventListener('blur', finishEditing)
+})
+
+document.querySelector('.modal').addEventListener('click', () => {
+    document.querySelector('.modal').style.display = 'none'
+})
+
+document.querySelector('.modal_content').addEventListener('click', e => {
+    e.stopPropagation()
 })
